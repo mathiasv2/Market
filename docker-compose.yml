@@ -1,0 +1,72 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  product_database:
+    image: mysql:8.0
+    restart: always
+    ports:
+      - "3306:3306"  
+    environment:
+      MYSQL_DATABASE: productdb
+      MYSQL_ROOT_PASSWORD: root 
+    volumes:
+      - product_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  commande_database:
+    image: mysql:8.0
+    restart: always
+    ports:
+      - "3307:3306" 
+    environment:
+      MYSQL_DATABASE: commanddb
+      MYSQL_ROOT_PASSWORD: root 
+    volumes:
+      - commande_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  gateway:
+    build:
+      context: ./MarketGatewayAPI
+    ports:
+      - "3000:80"
+
+  product:
+    build:
+      context: ./ProduitServiceAPI
+    ports:
+      - "5002:81"
+    environment:
+      - ConnectionStrings__Product_ConnectionString=server=product_database;port=3306;database=productdb;user=root;password=root
+    depends_on:
+      - rabbitmq
+      - product_database
+
+  command:
+    build:
+      context: ./CommandeServiceAPI
+    ports:
+      - "5037:5037"
+    environment:
+      - ConnectionStrings__Command_ConnectionString=server=commande_database;port=3306;database=commanddb;user=root;password=root
+    depends_on:
+      - rabbitmq
+      - commande_database
+
+volumes:
+  product_mysql_data:
+  commande_mysql_data:

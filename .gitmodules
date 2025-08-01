@@ -1,0 +1,9 @@
+[submodule "modules/MarketGatewayAPI"]
+	path = modules/MarketGatewayAPI
+	url = https://github.com/mathiasv2/MarketGatewayAPI
+[submodule "modules/CommandServiceAPI"]
+	path = modules/CommandServiceAPI
+	url = https://github.com/mathiasv2/CommandServiceAPI
+[submodule "modules/ProductServiceAPI"]
+	path = modules/ProductServiceAPI
+	url = https://github.com/mathiasv2/ProductServiceAPI
