@@ -41,13 +41,13 @@ services:
 
   gateway:
     build:
-      context: ./MarketGatewayAPI
+      context: ./modules/MarketGatewayAPI
     ports:
       - "3000:80"
 
   product:
     build:
-      context: ./ProduitServiceAPI
+      context: ./modules/ProductServiceAPI
     ports:
       - "5002:81"
     environment:
@@ -58,7 +58,7 @@ services:
 
   command:
     build:
-      context: ./CommandeServiceAPI
+      context: ./modules/CommandServiceAPI
     ports:
       - "5037:5037"
     environment:
