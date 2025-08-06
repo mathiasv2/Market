@@ -71,11 +71,10 @@ Both databases needed will be created, both microservices will start and you can
 
 | Layer              | Technology        |
 |--------------------|-------------------|
-| Language           | C# (.NET)         |
-| API Communication  | REST              |
+| Language           | C#     |
 | Messaging          | RabbitMQ          |
-| Databases          | MySQL (one per service) |
-| API Gateway        | Custom Gateway (C#) |
+| Databases          | MySQL - Entity Framework (one per service) |
+| API Gateway        | Ocelot |
 | Containerization   | Docker, Docker Compose |
 
 
