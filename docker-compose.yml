@@ -8,6 +8,11 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
 
   product_database:
     image: mysql:8.0
@@ -20,9 +25,11 @@ services:
     volumes:
       - product_mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
       retries: 10
+      start_period: 30s
 
   commande_database:
     image: mysql:8.0
@@ -35,9 +42,11 @@ services:
     volumes:
       - commande_mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
       retries: 10
+      start_period: 30s
 
   gateway:
     build:
@@ -53,19 +62,23 @@ services:
     environment:
       - ConnectionStrings__Product_ConnectionString=server=product_database;port=3306;database=productdb;user=root;password=root
     depends_on:
-      - rabbitmq
-      - product_database
+      rabbitmq:
+        condition: service_healthy
+      product_database:
+        condition: service_healthy
 
   command:
     build:
       context: ./modules/CommandServiceAPI
     ports:
-      - "5037:5037"
+      - "5037:82"
     environment:
       - ConnectionStrings__Command_ConnectionString=server=commande_database;port=3306;database=commanddb;user=root;password=root
     depends_on:
-      - rabbitmq
-      - commande_database
+      rabbitmq:
+        condition: service_healthy
+      commande_database:
+        condition: service_healthy
 
 volumes:
   product_mysql_data:
